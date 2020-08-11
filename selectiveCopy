@@ -1,0 +1,19 @@
+#!python3
+
+#selectiveCopy.py - program walks through a folder tree and searches for files with a certain
+#file extension (such as .pdf or .jpg). Copy these files from whatever location they are
+#in to a new folder.
+
+from pathlib import Path
+import os, shutil
+
+def selectiveCopy(searchPath, typ, destinatonPath):         #function which takes user specified path and file type as arguments
+    wpath = Path(searchPath)
+    ttyp = '*.' + typ
+    
+    for foldername, subfolders, files in os.walk(wpath):    #To explore the user specified path
+        wPathFoldername = Path(foldername)                  #convert all string path in OS paths
+        for n in list(wPathFoldername.glob(ttyp)):          
+            shutil.copy(n, destinatonPath)
+    
+    print('Done')
