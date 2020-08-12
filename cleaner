@@ -1,0 +1,34 @@
+#!python3
+#cleaner.py
+
+'''
+Deleting Unneeded Files
+It’s not uncommon for a few unneeded but humongous files or folders to take up
+the bulk of the space on your hard drive. If you’re trying to free up room on 
+your computer, you’ll get the most bang for your buck by deleting the most 
+massive of the unwanted files. But first you have to find them.
+
+Write a program that walks through a folder tree and searches for exceptionally
+large files or folders—say, ones that have a file size of more than 100MB. 
+(Remember that to get a file’s size, you can use os.path.getsize() from the os 
+module.) Print these files with their absolute path to the screen.
+'''
+
+import pyinputplus as pyip
+from pathlib import Path
+import os
+
+def cleaner():
+    userInput = pyip.inputFilepath()
+    path = Path(userInput)
+    path = os.path.abspath(path)
+    counter = 0
+    for folder,sub_folder,files in os.walk(path):
+        for file in files:
+            filePath = Path(folder)/file
+            if os.path.getsize(filePath) > 100000000:
+                print('File found at: ', filePath)
+                counter += 1
+    print('Found ' + str(counter) + ' ' + 'files')
+
+cleaner()
