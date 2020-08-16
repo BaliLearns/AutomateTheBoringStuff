@@ -1,0 +1,55 @@
+#!python3
+#fillingTheGaps.py
+
+'''
+Filling in the Gaps
+
+Write a program that finds all files with a given prefix,
+such as spam001.txt, spam002.txt, and so on, in a single 
+folder and locates any gaps in the numbering (such as if 
+there is a spam001.txt and spam003.txt but no spam002.txt). 
+Have the program rename all the later files to close this gap.
+'''
+
+from pathlib import Path
+import pyinputplus as pyip
+import os, glob, re, shutil
+
+def fillTheGaps():
+        #inputPath = pyip.inputFilepath(prompt = 'Enter file path: ', mustExist = True)
+        inputPath = r'C:\Users\Vinamra\Documents\Coding and practice\PP'
+        P = Path(inputPath)
+        assert os.path.exists(inputPath), 'I did not find path:'+ str(inputPath)
+        #inputPrefix = pyip.inputStr(prompt = 'Enter prefix to search in the path entered: ')
+        inputPrefix = 'spam'
+        files = P.glob(inputPrefix + '*.*')
+        filesPath = list(files)             # ALL FILE PATHS
+
+        fileNames = []
+        for path in filesPath:              # SEPERATE FILE NAME 
+            fileNames.append(path.name)
+        fileNumbers = {}                    # SEPERATE FILE NUMBERS
+        for file in fileNames:
+            sreg = re.compile(r'(\d+)(\.[A-z]+)')       # FINDS DIGITS IN FILENAME
+            mink = sreg.search(file)
+            number = mink.group(1)
+            extension = mink.group(2)
+            fileNumbers[int(number)] = extension    # A DICTIONARY TO HAVE FILE EXTENTION NUMBERS WITH FILES
+        
+        Numbers = list(fileNumbers.keys())  # A LIST OF EXTENTION NUMBERS SORTED
+        Numbers.sort()
+        d = {}
+        for n in range(len(Numbers)):       # MATCHING EXTENTION NUMBERS WITH LENGTH SO THAT AS PER THE LENGHTH CORRECT EXTENTION NUMBER COULD BE ASSIGNED TO THE FILE
+            d[Numbers[n]] = n+1
+        
+        finalD = {}
+        for n in fileNumbers:               #MATCHING NEW FILE NUMBERS WITH NAMES OF FILES
+            finalD[n] = [d[n] ,fileNumbers[n]]
+        
+        for n,m in finalD.items():
+            oldName = inputPrefix + str(n) + str(m[1])
+            newName = inputPrefix + str(m[0]) + str(m[1])
+            shutil.move(P/oldName, P/newName)
+
+
+fillTheGaps()
