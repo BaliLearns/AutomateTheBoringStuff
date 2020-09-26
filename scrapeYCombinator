@@ -1,0 +1,43 @@
+#!python3
+#textFilemaker.py : makes text files of all the text of the article links in Y combinator
+
+import requests, sys, os, shutil
+from pathlib import Path
+from bs4 import BeautifulSoup
+from bs4.element import Comment
+
+#Function to remove any extra non required text
+def tag_visible(element):
+    if element.parent.name in ['styles', 'script', 'head', 'title', 'meta', '[document]']:
+        return False
+    if isinstance(element, Comment):
+        return False
+    return True
+
+#Gets all the article links on Y combinator
+res = requests.get('https://news.ycombinator.com/')
+print('getting the website....')
+res.raise_for_status()
+soup = BeautifulSoup(res.text, 'html.parser')
+webpages = soup.find_all('a', {'class' : 'storylink'})
+print('getting the sub links in the website.....')
+
+#Makes a directory, if it already exists overwrites it
+dir = Path.home()/'test'
+if os.path.exists(dir):
+    shutil.rmtree(dir)
+os.mkdir(dir)
+
+#each article link is accessed and all its text is saved in a text file with articles title
+for page in webpages:
+    newRes = requests.get(page.get('href'))
+    head = page.contents[0].replace(',','').replace('?','')
+    print('getting sublink: ' + page.get('href') +'\n' + 'Titled: ' + head)
+    newSoup = BeautifulSoup(newRes.text, 'html.parser')
+    text = newSoup.find_all(text = True)
+    visible_texts = filter(tag_visible, text)
+    text = u" ".join(t.strip() for t in visible_texts)
+    path = str(dir) + '\\' + head + '.txt'
+    file = open(path, 'a', encoding = 'utf-8')
+    file.write(text)
+    file.close()
